@@ -27,52 +27,6 @@ $(document).ready(function () {
     ShowIndividualprofile();
 });
 //----------------------
-$("#pdpStartToday").persianDatepicker({
-    startDate: "today",
-    endDate: "1395/5/5"
-});
-$("jQuerySelectQuery").persianDatepicker({
-    months: ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"],
-    dowTitle: ["شنبه", "یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه"],
-    shortDowTitle: ["ش", "ی", "د", "س", "چ", "پ", "ج"],
-    showGregorianDate: !1,
-    persianNumbers: !0,
-    formatDate: "YYYY/MM/DD",
-    selectedBefore: !1,
-    selectedDate: null,
-    startDate: null,
-    endDate: null,
-    prevArrow: '\u25c4',
-    nextArrow: '\u25ba',
-    theme: 'default',
-    alwaysShow: !1,
-    selectableYears: null,
-    selectableMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-    cellWidth: 25, // by px
-    cellHeight: 20, // by px
-    fontSize: 13, // by px
-    isRTL: !1,
-    calendarPosition: {
-        x: 0,
-        y: 0,
-    },
-    onShow: function () { },
-    onHide: function () { },
-    onSelect: function () { },
-    onRender: function () { }
-});
-//-----------------
-function removeRow(ss, Id) {
-    //remove Item in Array
-    for (var i = 0; i < _DetailsObjects.length; i++) {
-        if (_DetailsObjects[i].ID === Id) {
-            _DetailsObjects.splice(i, 1);
-            i--;
-        }
-    }
-    //remove tr element
-    $($(ss).closest("tr")).remove();
-}
 function calDayOfWeek(date) {
     var mounth = ""
     var rooz = ""
@@ -204,6 +158,9 @@ function showMessage(message) {
     // setTimeout(function () { $("#message p").remove() }, 5000);
     $("#message").append("<p class='message'>" + message + "</p>");
 }
+async function showCartabl(){
+  var GIG_MTH_Request=await   getGIG_MTH_Request()
+}
 //-------------------------------------------------------
 function CreateGIG_MTH_Request() {
     var description = $("#description").val()
@@ -218,10 +175,16 @@ function CreateGIG_MTH_Request() {
             IsFinish: "درگردش",
             confirmUserId:641/*MTH_Confirm => group*/
         }).then(function (item) {
-            console.log(item);
             resolve(item);
         });
     });
+}
+function getGIG_MTH_Request() {
+    return new Promise(resolve => {
+    $pnp.sp.web.lists.getByTitle("GIG_MTH_Request").items.get().then(function (items) {
+        resolve(items);
+    });
+});
 }
 function CreateGIG_MTH_Details(GIG_MTH_Request, GIG_MTH_Details) {
     return new Promise(resolve => {
@@ -240,7 +203,6 @@ function CreateGIG_MTH_Details(GIG_MTH_Request, GIG_MTH_Details) {
 
 }
 function GetGIG_MTH_Details(_Date) {
-
     return new Promise(resolve => {
         $pnp.sp.web.lists.
             getByTitle("GIG_MTH_Details").
@@ -250,7 +212,6 @@ function GetGIG_MTH_Details(_Date) {
             // orderBy("Modified", true).
             get().
             then(function (items) {
-
                 resolve(items);
             });
     });

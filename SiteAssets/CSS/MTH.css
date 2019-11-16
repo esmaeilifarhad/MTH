@@ -44,6 +44,36 @@ h3 {
     from {background-color: white;}
     to {background-color: gray;}
   }
+  #message a{
+    font-weight: bolder;
+  color:blue;
+  }
+#message .message{
+  -webkit-animation-name: showMessage; /* Safari 4.0 - 8.0 */
+  -webkit-animation-duration:8s; /* Safari 4.0 - 8.0 */
+  animation-name: showMessage;
+  animation-duration: 8s;
+ 
+  font-weight: bolder;
+  color: red;
+}
+  /* Safari 4.0 - 8.0 */
+  @-webkit-keyframes showMessage {
+    0%   { right:0px; top:0px;}
+    25%  { right:200px; top:20px;}
+    50%  { right:300px; top:40px;}
+    75%  { right:400px; top:60px;}
+    100% { right:0px; top:0px;}
+  }
+  
+  /* Standard syntax */
+  @keyframes showMessage {
+    0%   {color: black }
+    25%  { /*text-shadow: 1px 1px 2px black, 0 0 25px blue, 0 0 5px darkblue;*/ }
+    50%  { /*text-shadow: 1px 1px 2px black, 0 0 25px blue, 0 0 5px darkblue;*/ }
+    75%  { }
+    100% { left:500px; top:500px;color: red;font-weight: bolder}
+  }
 
 
   .main #imgFatLevel {

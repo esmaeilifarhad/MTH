@@ -165,12 +165,6 @@ async function addDetail() {
         showMessage("لطفا تاریخ را مشخص نمایید")
         return;
     }
-debugger
-    if(($("#description").val().trim().length)<10){
-        showMessage("توضیحات باید بیشتر از 10 کاراکتر باشد")
-        return;
-    }
-
     $("#message p").remove();
     _DetailsObjects.push({ ID: _Id, pdpDark: pdpDark, isFood: isFood, description: description })
 
@@ -194,17 +188,7 @@ debugger
 
 }
 //-------------------------------------------------------
-async function showAzmayeshPeriod() {
-    var AzmayeshPeriod = await GetAzmayeshPeriod()
-    var selectOption = "<select onchange='getval(this)'>"
-    for (let index = 0; index < AzmayeshPeriod.length; index++) {
-        selectOption += "<option value=" + AzmayeshPeriod[index].Id + ">" + AzmayeshPeriod[index].Title + "</option>"
-    }
-    selectOption += "</select>"
-    $("#dore").append(selectOption)
-    dore = $("#dore select").val()
-    ShowAzmayeshMaster();
-}
+
 async function ShowIndividualprofile() {
     $("#NameUser").next().remove();
     $("#PID").next().remove();
@@ -221,165 +205,7 @@ async function ShowIndividualprofile() {
     $("#Department").after("<span>" + CurrentDep + "</span>");
 
 }
-async function showAzmayeshDetail(AzmayeshMaster) {
-    $("#tableres table").remove()
 
-    var AzmayeshName = await GetAzmayeshName();
-    var AzmayeshDetail = await GetAzmayeshDetail(AzmayeshMaster);
-    showRefrenceRange(AzmayeshMaster, AzmayeshDetail);
-
-
-
-    function checkAdult(age) {
-        if (age.ID == xxx) {
-            yyy = age.Category.Title;
-        }
-    }
-
-    var table = "<table class='tblH table'>"
-    table += "<tr>"
-    table += "<th>عنوان</th><th>نام</th><th>گروه</th><th>توضیحات</th><th>نتیجه</th>"
-    table += "</tr>"
-    for (var i = 0; i < AzmayeshDetail.length; i++) {
-        xxx = AzmayeshDetail[i].Azmayesh.Id
-        AzmayeshName.find(checkAdult)
-
-        table += "<tr>"
-
-        table += "<td>"
-        table += AzmayeshDetail[i].Azmayesh.Code
-        table += "</td>"
-        table += "<td>"
-        table += AzmayeshDetail[i].Azmayesh.Title
-        table += "</td>"
-
-        table += "<td>"
-        table += yyy
-        table += "</td>"
-        table += "<td>"
-        table += AzmayeshDetail[i].Azmayesh.Description
-        table += "</td>"
-        table += "<td>"
-        table += AzmayeshDetail[i].Result
-        table += "</td>"
-        table += "</tr>"
-    }
-    table += "</table>"
-    $("#tableres").append(table);
-}
-async function showRefrenceRange(AzmayeshMaster, AzmayeshDetail) {
-    // var RefrenceRange = await GetRefrenceRange(AzmayeshMaster, AzmayeshDetail);
-    /*
-     console.log(AzmayeshMaster)
-     console.log(AzmayeshDetail)
-     console.log(RefrenceRange)
-     */
-    $("#tableres2 table").remove()
-    var table = "<table class='tblH table'>"
-    table += "<tr>"
-    table += "<th>عنوان</th><th>نام</th><th>Title</th><th>Description</th>"
-    table += "</tr>"
-    for (let i = 0; i < AzmayeshDetail.length; i++) {
-        // console.log(AzmayeshDetail[i].Azmayesh.Title)
-        var RefrenceRange = await GetRefrenceRange(AzmayeshMaster, AzmayeshDetail[i])
-        debugger
-        console.log(RefrenceRange)
-        if (RefrenceRange == undefined)
-            continue
-        if (RefrenceRange.length > 0) {
-
-            table += "<tr>"
-            table += "<td>"
-            table += RefrenceRange[0].Azmayesh.Code
-            table += "</td>"
-            table += "<td>"
-            table += RefrenceRange[0].Azmayesh.Title
-            table += "</td>"
-
-            table += "<td>"
-            table += RefrenceRange[0].Id
-            table += "</td>"
-            table += "<td>"
-            table += RefrenceRange[0].Status.Title
-            table += "</td>"
-            table += "<tr>"
-
-        }
-    }
-    table += "</table>"
-    $("#tableres2").append(table);
-}
-function showImage(AzmayeshMaster) {
-    $("#imgFatLevel img").remove()
-    $("#imgFatLevel p").remove()
-    var BMI = AzmayeshMaster[0].BMI;
-    var BMIMessage = "No Matching";
-    //  for (let i = 0; i < 5; i++) {
-    if (BMI > 0 && BMI <= 18.4) {
-        $("#imgFatLevel").append("<img src='https://portal.golrang.com/healthsystem/SiteAssets/img/12.jpg' alt='Girl in a jacket' width='30' height='80'>");
-        BMIMessage = "کمبود وزن";
-    }
-    else {
-        $("#imgFatLevel").append("<img src='https://portal.golrang.com/healthsystem/SiteAssets/img/11.jpg' alt='Girl in a jacket' width='30' height='80'>");
-    }
-    if (BMI > 18.5 && BMI <= 24.9) {
-        $("#imgFatLevel").append("<img src='https://portal.golrang.com/healthsystem/SiteAssets/img/22.jpg' alt='Girl in a jacket' width='30' height='80'>");
-        console.log("نرمال");
-        BMIMessage = "نرمال";
-    }
-    else {
-        $("#imgFatLevel").append("<img src='https://portal.golrang.com/healthsystem/SiteAssets/img/21.jpg' alt='Girl in a jacket' width='30' height='80'>");
-    }
-    if (BMI > 25 && BMI <= 29.9) {
-        $("#imgFatLevel").append("<img src='https://portal.golrang.com/healthsystem/SiteAssets/img/32.jpg' alt='Girl in a jacket' width='30' height='80'>");
-        console.log("اضافه وزن");
-        BMIMessage = "اضافه وزن";
-    }
-    else {
-        $("#imgFatLevel").append("<img src='https://portal.golrang.com/healthsystem/SiteAssets/img/31.jpg' alt='Girl in a jacket' width='30' height='80'>");
-    }
-    if (BMI > 30 && BMI <= 34.9) {
-        $("#imgFatLevel").append("<img src='https://portal.golrang.com/healthsystem/SiteAssets/img/42.jpg' alt='Girl in a jacket' width='30' height='80'>");
-        console.log("اضافه وزن درجه 1");
-        BMIMessage = "اضافه وزن درجه 1";
-    }
-    else {
-        $("#imgFatLevel").append("<img src='https://portal.golrang.com/healthsystem/SiteAssets/img/41.jpg' alt='Girl in a jacket' width='30' height='80'>");
-    }
-    if (BMI > 35 && BMI <= 39.9) {
-        $("#imgFatLevel").append("<img src='https://portal.golrang.com/healthsystem/SiteAssets/img/52.jpg' alt='Girl in a jacket' width='30' height='80'>");
-        console.log("اضافه وزن درجه 2");
-        BMIMessage = "اضافه وزن درجه 2";
-    }
-    else {
-        $("#imgFatLevel").append("<img src='https://portal.golrang.com/healthsystem/SiteAssets/img/51.jpg' alt='Girl in a jacket' width='30' height='80'>");
-    }
-    $("#imgFatLevel").append("<p>" + BMIMessage + "</p>");
-    /*
-    var BMI = form.GetControl("c_BMI").GetValue();
-    if (BMI == 0 ) {
-    console.log("-");
-    }
-    else if ( BMI > 0 && BMI <= 18.4 ) {
-    console.log("کمبود وزن");
-    }
-    else if (BMI > 18.5 && BMI <= 24.9 ) {
-    console.log("نرمال");
-    }
-    else if (BMI > 25 && BMI <= 29.9 ) {
-    console.log("اضافه وزن");
-    }
-    else if (BMI > 30 && BMI <= 34.9 ) {
-    console.log("اضافه وزن درجه 1");
-    }
-    else if (BMI > 35 && BMI <= 39.9 ) {
-    console.log("اضافه وزن درجه 2");
-    }
-    else {
-    console.log("اضافه وزن درجه 3");
-    }
-    */
-}
 function showMessage(message) {
     $("#message p").remove()
     // setTimeout(function () { $("#message p").remove() }, 5000);

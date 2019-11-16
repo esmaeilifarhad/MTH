@@ -226,18 +226,17 @@ function CreateGIG_MTH_Request() {
 function CreateGIG_MTH_Details(GIG_MTH_Request, GIG_MTH_Details) {
     return new Promise(resolve => {
         $pnp.sp.web.lists.getByTitle("GIG_MTH_Details").items.add({
-            Title: "test",
+            Title: CurrentName,
+            StatusWF:"درگردش",
             Date: GIG_MTH_Details.pdpDark,
             IsFood: GIG_MTH_Details.isFood,
             Dsc: GIG_MTH_Details.description,
             MasterIdId: GIG_MTH_Request.data.Id
         }).then(function (item) {
-            debugger
-            console.log(item);
+            //console.log(item);
             resolve(item);
         });
     });
-
 }
 function GetGIG_MTH_Details(_Date) {
 

@@ -4,6 +4,7 @@ var CurrentPID = 0;
 var CurrentName = ""
 var CurrentDep = ""
 var CurrentPLoginName = ""
+var _PersonelInfo;
 
 var _DetailsObjects = []
 /*
@@ -24,6 +25,9 @@ $(document).ready(function () {
     CurrentName = sessionStorage.getItem("PFName");
     CurrentDep = sessionStorage.getItem("DName");
     CurrentPLoginName = sessionStorage.getItem("CurrentPLoginName");
+   
+    //callservice();
+    // callserviceTolidCode();
     ShowIndividualprofile();
 });
 //----------------------
@@ -131,7 +135,7 @@ async function save() {
     }
     showMessage("درخواست شما با موفقیت ذخیره شد")
     $("#message").append("<a target='_blank' href='https://portal.golrang.com/_layouts/15/foodorder/foodorderpage.aspx'>لطفا برای اتخاب غذا کلیک نمایید</a>");
-//
+    //
 }
 async function addDetail() {
     _Id += 1;
@@ -142,7 +146,7 @@ async function addDetail() {
 
     var IsDuplicate = await GetGIG_MTH_Details(pdpDark)
     if (IsDuplicate.length > 0) {
-        showMessage("برای این روز  "+pdpDark+" درخواست ثبت شده است")
+        showMessage("برای این روز  " + pdpDark + " درخواست ثبت شده است")
         return;
     }
     var res = _DetailsObjects.find(x => x.pdpDark === pdpDark);
@@ -154,12 +158,12 @@ async function addDetail() {
         showMessage("لطفا تاریخ را مشخص نمایید")
         return;
     }
-    if(($("#description").val().trim().length)<10){
-                showMessage("توضیحات باید بیشتر از 10 کاراکتر باشد")
-                return;
-            }
+    if (($("#description").val().trim().length) < 10) {
+        showMessage("توضیحات باید بیشتر از 10 کاراکتر باشد")
+        return;
+    }
 
-        
+
     $("#message p").remove();
     _DetailsObjects.push({ ID: _Id, pdpDark: pdpDark, isFood: isFood, description: description })
 
@@ -184,6 +188,9 @@ async function addDetail() {
 }
 //-------------------------------------------------------
 async function ShowIndividualprofile() {
+    _PersonelInfo=await servicePersonelInfo();
+    console.log(_PersonelInfo.PersonelInfo)
+    console.log(_PersonelInfo.PersonelInfo.Gender)
     $("#NameUser").next().remove();
     $("#PID").next().remove();
     $("#Department").next().remove();
@@ -195,7 +202,7 @@ async function ShowIndividualprofile() {
 
     $("#NameUser").after("<span>" + CurrentName + "</span>");
     $("#PID").after("<span>" + CurrentPID + "</span>");
-    $("#Semat").after("<span>" + CurrentDep + "</span>");
+    $("#Semat").after("<span>" + _PersonelInfo.PersonelInfo.Semat + "</span>");
     $("#Department").after("<span>" + CurrentDep + "</span>");
 
 }
@@ -206,17 +213,19 @@ function showMessage(message) {
 }
 //-------------------------------------------------------
 function CreateGIG_MTH_Request() {
-    var description = $("#description").val()
-    var isFood = $("#isFood").prop("checked")
+   // var description = $("#description").val()
+   // var isFood = $("#isFood").prop("checked")
     return new Promise(resolve => {
         $pnp.sp.web.lists.getByTitle("GIG_MTH_Request").items.add({
             Title: CurrentName,
             Personelid: CurrentPID,
-            Description: description,
+           // Description: description,
+            UserId:sessionStorage.getItem("UID"),
             DepName: CurrentDep,
+            DepId:_PersonelInfo.PersonelInfo.DepId,
             CID: CurrentCID,
-            IsFinish: "درگردش",
-            confirmUserId:641/*MTH_Confirm => group*/
+            IsFinish: "درگردش"
+           // confirmUserId: 641/*MTH_Confirm => group*/
         }).then(function (item) {
             console.log(item);
             resolve(item);
@@ -227,11 +236,12 @@ function CreateGIG_MTH_Details(GIG_MTH_Request, GIG_MTH_Details) {
     return new Promise(resolve => {
         $pnp.sp.web.lists.getByTitle("GIG_MTH_Details").items.add({
             Title: CurrentName,
-            StatusWF:"درگردش",
+            StatusWF: "درگردش",
             Date: GIG_MTH_Details.pdpDark,
             IsFood: GIG_MTH_Details.isFood,
             Dsc: GIG_MTH_Details.description,
-            MasterIdId: GIG_MTH_Request.data.Id
+            MasterIdId: GIG_MTH_Request.data.Id,
+            step:0
         }).then(function (item) {
             //console.log(item);
             resolve(item);
@@ -243,17 +253,46 @@ function GetGIG_MTH_Details(_Date) {
     return new Promise(resolve => {
         $pnp.sp.web.lists.
             getByTitle("GIG_MTH_Details").
-            items.select().
-            // expand("Azmayesh,MasterID").
-            filter("(Date eq '" + _Date + "')").
+            items.select("Date,MasterId/Personelid").
+             expand("MasterId").
+            filter("(Date eq '" + _Date + "') and (MasterId/Personelid eq  "+CurrentPID+")").
             // orderBy("Modified", true).
             get().
             then(function (items) {
-
+debugger
                 resolve(items);
             });
     });
 }
+function servicePersonelInfo() {
+    return new Promise(resolve => {
+        var serviceURL = "https://portal.golrang.com/_vti_bin/SPService.svc/InformationPersonel"
+        var request = { PersonelId:CurrentPID, CID: CurrentCID }
+        $.ajax({
+            type: "POST",
+            url: serviceURL,
+            contentType: "application/json; charset=utf-8",
+            xhrFields: {
+                'withCredentials': true
+            },
+            dataType: "json",
+            data: JSON.stringify(request),
+            //processData: false,
+            success: function (data) {
+                resolve(data);
+               // console.log(data);
+
+            },
+            error: function (a) {
+                console.log(a);
+            }
+        });
+    })
+}
+
+
+
+
 //-------------------------------------------------------
 function foramtDate(str) {
     return str.slice(0, 2) + "/" + str.slice(2, 4) + "/" + str.slice(4, 6)

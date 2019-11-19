@@ -5,11 +5,13 @@ var CurrentName = ""
 var CurrentDep = ""
 var CurrentPLoginName = ""
 
-var _DetailsObjects = []
+var _UserInGroupos = []
+var _checkedItem = []
 /*
 List Name :
 GIG_MTH_Request
 GIG_MTH_Details
+GIG_MTH_Confirm
 */
 $(document).ready(function () {
     //-----npm initial header Request
@@ -24,187 +26,104 @@ $(document).ready(function () {
     CurrentName = sessionStorage.getItem("PFName");
     CurrentDep = sessionStorage.getItem("DName");
     CurrentPLoginName = sessionStorage.getItem("CurrentPLoginName");
+
+
     showCartabl();
+
 });
-//----------------------
 
-async function save() {
-
-    if (_DetailsObjects.length == 0) {
-        showMessage("هیچ رکوردی برای ذخیره پیدا نشد.")
-        return;
-    }
-    for (let index = 0; index < _DetailsObjects.length; index++) {
-        var IsDuplicate = await GetGIG_MTH_Details(_DetailsObjects[index].pdpDark)
-        if (IsDuplicate.length > 0) {
-            showMessage("برای این روز " + _DetailsObjects[index].pdpDark + "  درخواست ثبت شده است")
-            return;
-        }
-    }
-    var GIG_MTH_Request = await CreateGIG_MTH_Request();
-    for (let index = 0; index < _DetailsObjects.length; index++) {
-        var GIG_MTH_Detail = await CreateGIG_MTH_Details(GIG_MTH_Request, _DetailsObjects[index]);
-    }
-    showMessage("درخواست شما با موفقیت ذخیره شد")
-    $("#message").append("<a target='_blank' href='https://portal.golrang.com/_layouts/15/foodorder/foodorderpage.aspx'>لطفا برای اتخاب غذا کلیک نمایید</a>");
-    //
-}
-async function addDetail() {
-    _Id += 1;
-    var pdpDark = $("#pdpDark").val()
-    var description = $("#description").val()
-    var isFood = $("#isFood").prop("checked")
-
-
-    var IsDuplicate = await GetGIG_MTH_Details(pdpDark)
-    if (IsDuplicate.length > 0) {
-        showMessage("برای این روز  " + pdpDark + " درخواست ثبت شده است")
-        return;
-    }
-    var res = _DetailsObjects.find(x => x.pdpDark === pdpDark);
-    if (res != undefined) {
-        showMessage("درخواست تکراری نمیتوان ثبت کرد")
-        return;
-    }
-    if (pdpDark == "" || pdpDark == null) {
-        showMessage("لطفا تاریخ را مشخص نمایید")
-        return;
-    }
-    if (($("#description").val().trim().length) < 10) {
-        showMessage("توضیحات باید بیشتر از 10 کاراکتر باشد")
-        return;
-    }
-
-
-    $("#message p").remove();
-    _DetailsObjects.push({ ID: _Id, pdpDark: pdpDark, isFood: isFood, description: description })
-
-    var table = ""
-    table += "<tr Data_Id=" + _Id + ">"
-    table += "<td col='pdpDark'>"
-    table += pdpDark
-    table += "</td>"
-    table += "<td col='DayOfWeek'>"
-    table += calDayOfWeek(pdpDark)
-    table += "</td>"
-    table += "<td col='description'>"
-    table += description
-    table += "</td>"
-    table += "<td col='isFood'>"
-    table += (isFood == true) ? "<span style='color:green' class='fa fa-check  pointer'></span>" : "<span style='color:red' class='fa fa-remove  pointer'></span>"
-    table += "</td>"
-    table += "<td col='remove'><span style='color:mediumvioletred' class='fa fa-remove RemoveWord pointer' onclick='removeRow(this," + _Id + ")'></span></td>"
-    table += "</tr>"
-    $("#tableres2 table").append(table);
-
-}
 //-------------------------------------------------------
-async function ShowIndividualprofile() {
-    $("#NameUser").next().remove();
-    $("#PID").next().remove();
-    $("#Department").next().remove();
-    $("#Semat").next().remove();
 
-    // var AzmayeshMaster = await GetAzmayeshMaster();
-    //  showAzmayeshDetail(AzmayeshMaster);
-    // showImage(AzmayeshMaster)
-
-    $("#NameUser").after("<span>" + CurrentName + "</span>");
-    $("#PID").after("<span>" + CurrentPID + "</span>");
-    $("#Semat").after("<span>" + CurrentDep + "</span>");
-    $("#Department").after("<span>" + CurrentDep + "</span>");
-
-}
 function showMessage(message) {
     $("#message p").remove()
     // setTimeout(function () { $("#message p").remove() }, 5000);
     $("#message").append("<p class='message'>" + message + "</p>");
 }
 async function showCartabl() {
-    var GIG_MTH_Details = await GetGIG_MTH_Details()
-    var table = ""
-    for (let index = 0; index < GIG_MTH_Details.length; index++) {
 
-        table += "<tr Data_Id=" + GIG_MTH_Details[index].ID + ">"
-        table += "<td col='pdpDark'>"
-        table += (index+1)
-        table += "</td>"
-        table += "<td col='pdpDark'>"
-        table += GIG_MTH_Details[index].MasterId.Title
-        table += "</td>"
-        table += "<td col='pdpDark'>"
-        table += GIG_MTH_Details[index].MasterId.DepName
-        table += "</td>"
-        table += "<td col='DayOfWeek'>"
-        table += GIG_MTH_Details[index].Date
-        table += "</td>"
-        table += "<td col='DayOfWeek'>"
-        table += calDayOfWeek(GIG_MTH_Details[index].Date)
-        table += "</td>"
-        table += "<td col='description'>"
-        table += GIG_MTH_Details[index].Dsc
-        table += "</td>"
-        table += "<td col='isFood'>"
-        debugger
-        table += (GIG_MTH_Details[index].IsFood == true) ? "<span style='color:green' class='fa fa-check  pointer'></span>" : "<span style='color:red' class='fa fa-remove  pointer'></span>"
-        table += "</td>"
-        table += "<td>"
-        table += "<input type=checkbox Data_Id=" + GIG_MTH_Details[index].ID + " />"
-        table += "</td>"
-       // table += "<td col='remove'><span style='color:mediumvioletred' class='fa fa-remove RemoveWord pointer' onclick='removeRow(this," + _Id + ")'></span></td>"
-        table += "</tr>"
+    var GIG_MTH_Confirm = await GetGIG_MTH_Confirm();
+    var CurrentUserinGroups = await getCurrentUserinGroups();
+
+    //console.log(CurrentUserinGroups)
+    var filterGIG_MTH_Details = ""
+    for (let index = 0; index < GIG_MTH_Confirm.length; index++) {
+        var res = CurrentUserinGroups.find(x => x.ID === GIG_MTH_Confirm[index].ConfirmationId);
+        if (res != undefined) {
+            filterGIG_MTH_Details += "  (MasterId/DepId eq '" + GIG_MTH_Confirm[index].DepId + "') or"
+        }
     }
-    $("#tableres2 table").append(table);
+
+    //delete last 4 char for remove or
+    filterGIG_MTH_Details = filterGIG_MTH_Details.substring(0, filterGIG_MTH_Details.length - 3)
+
+
+    var GIG_MTH_Details = await GetGIG_MTH_Details(filterGIG_MTH_Details)
+    if (GIG_MTH_Details == "" || GIG_MTH_Details == undefined) {
+        $("#tableres2 table").append("<tr><td colspan=8>موردی برای مشاهده وجود ندارد</td></tr>");
+    }
+    else {
+        var table = ""
+        for (let index = 0; index < GIG_MTH_Details.length; index++) {
+            table += "<tr Data_Id=" + GIG_MTH_Details[index].ID + ">"
+            table += "<td col='pdpDark'>"
+            table += (index + 1)
+            table += "</td>"
+            table += "<td col='pdpDark'>"
+            table += GIG_MTH_Details[index].MasterId.Title
+            table += "</td>"
+            table += "<td col='pdpDark'>"
+            table += GIG_MTH_Details[index].MasterId.DepName
+            table += "</td>"
+            table += "<td col='DayOfWeek'>"
+            table += GIG_MTH_Details[index].Date
+            table += "</td>"
+            table += "<td col='DayOfWeek'>"
+            table += calDayOfWeek(GIG_MTH_Details[index].Date)
+            table += "</td>"
+            table += "<td col='description'>"
+            table += GIG_MTH_Details[index].Dsc
+            table += "</td>"
+            table += "<td col='isFood'>"
+            table += (GIG_MTH_Details[index].IsFood == true) ? "<span style='color:green' class='fa fa-check  pointer'></span>" : "<span style='color:red' class='fa fa-remove  pointer'></span>"
+            table += "</td>"
+            table += "<td>"
+            table += "<input type=checkbox Data_Id=" + GIG_MTH_Details[index].ID + " />"
+            table += "</td>"
+            // table += "<td col='remove'><span style='color:mediumvioletred' class='fa fa-remove RemoveWord pointer' onclick='removeRow(this," + _Id + ")'></span></td>"
+            table += "</tr>"
+        }
+        $("#tableres2 table").append(table);
+    }
 
 }
 //-------------------------------------------------------
-function CreateGIG_MTH_Request() {
-    var description = $("#description").val()
-    var isFood = $("#isFood").prop("checked")
-    return new Promise(resolve => {
-        $pnp.sp.web.lists.getByTitle("GIG_MTH_Request").items.add({
-            Title: CurrentName,
-            Personelid: CurrentPID,
-            Description: description,
-            DepName: CurrentDep,
-            CID: CurrentCID,
-            IsFinish: "درگردش",
-            confirmUserId: 641/*MTH_Confirm => group*/
-        }).then(function (item) {
-            resolve(item);
-        });
-    });
-}
-function getGIG_MTH_Request() {
-    return new Promise(resolve => {
-        $pnp.sp.web.lists.getByTitle("GIG_MTH_Request").items.get().then(function (items) {
-            resolve(items);
-        });
-    });
-}
-function CreateGIG_MTH_Details(GIG_MTH_Request, GIG_MTH_Details) {
-    return new Promise(resolve => {
-        $pnp.sp.web.lists.getByTitle("GIG_MTH_Details").items.add({
-            Title: "test",
-            Date: GIG_MTH_Details.pdpDark,
-            IsFood: GIG_MTH_Details.isFood,
-            Dsc: GIG_MTH_Details.description,
-            MasterIdId: GIG_MTH_Request.data.Id
-        }).then(function (item) {
-            debugger
-            console.log(item);
-            resolve(item);
-        });
-    });
 
-}
-function GetGIG_MTH_Details() {
+function GetGIG_MTH_Details(filterGIG_MTH_Details) {
+    // console.log(filterGIG_MTH_Details)
+
+    if (filterGIG_MTH_Details == null || filterGIG_MTH_Details == "")
+        return
     return new Promise(resolve => {
         $pnp.sp.web.lists.
             getByTitle("GIG_MTH_Details").
-            items.select("MasterId/Id,MasterId/Title,MasterId/Personelid,MasterId/DepName,Id,Title,Dsc,IsFood,Date").top(500).
-             expand("MasterId").
-            filter("(StatusWF eq 'درگردش')").
+            items.select("MasterId/Id,MasterId/Title,MasterId/Personelid,MasterId/DepName,Id,Title,Dsc,IsFood,Date").top(1000).
+            expand("MasterId").
+            filter("(StatusWF eq 'درگردش') and (" + filterGIG_MTH_Details + ")").
+            // orderBy("Modified", true).
+            get().
+            then(function (items) {
+                // debugger
+                resolve(items);
+            });
+    });
+}
+function GetGIG_MTH_Confirm() {
+    return new Promise(resolve => {
+        $pnp.sp.web.lists.
+            getByTitle("GIG_MTH_Confirm").
+            items.select().
+            // expand("MasterId").
+            //filter("(StatusWF eq 'درگردش')").
             // orderBy("Modified", true).
             get().
             then(function (items) {
@@ -212,10 +131,90 @@ function GetGIG_MTH_Details() {
             });
     });
 }
-//-------------------------------------------------------
+function getCurrentUserinGroups() {
+    return new Promise(resolve => {
+        var endpointUrl = _spPageContextInfo.webServerRelativeUrl + '/_api/web/currentuser/?$expand=groups';
+        return $.ajax({
+            url: endpointUrl,
+            method: "GET",
+            contentType: "application/json;odata=verbose",
+            headers: { "Accept": "application/json;odata=verbose" },
+            success: function (data) {
+
+                for (let index = 0; index < data.d.Groups.results.length; index++) {
+                    _UserInGroupos.push({ ID: data.d.Groups.results[index].Id, Title: data.d.Groups.results[index].Title })
+                    // resolve(userGroups)
+                    // console.log(userGroups[index].Title+" - "+userGroups[index].Id);
+                    //  console.log("***********************");
+                }
+                resolve(_UserInGroupos)
+            },
+            error: function (data) {
+                console.log(JSON.stringify(data));
+            }
+
+        });
+    })
+}
+function updateGIG_MTH_Details(id, type) {
+    if (type = "yes") {
+        return new Promise(resolve => {
+            var list = $pnp.sp.web.lists.getByTitle("GIG_MTH_Details");
+            list.items.getById(id).update({
+                step: 1,
+            }).then(function (item) {
+                resolve(item)
+                // console.log(item);
+            });
+
+        })
+    }
+    if (type = "no") {
+        return new Promise(resolve => {
+            var list = $pnp.sp.web.lists.getByTitle("GIG_MTH_Details");
+            list.items.getById(id).update({
+                step: 0,
+            }).then(function (item) {
+                resolve(item)
+                // console.log(item);
+            });
+
+        })
+    }
+}
+
+//-----------------------------
+async function confirm() {
+    $("#tableres2 table tr td input").each(function () {
+        //  console.log($(this))
+        // console.log($(this).context.checked)
+        // console.log($(this).init)
+        if ($(this).context.checked == true) {
+            _checkedItem.push({ ID: $(this).attr("data_id") })
+        }
+    })
+    for (let index = 0; index < _checkedItem.length; index++) {
+        console.log(_checkedItem[index].ID)
+        var res = await updateGIG_MTH_Details(_checkedItem[index].ID, "yes")
+    }
+
+    // alert("confirm")
+}
+function reject() {
+    $("#tableres2 table tr td input").each(function () {
+        if ($(this).context.checked == true) {
+            _checkedItem.push({ ID: $(this).attr("data_id") })
+        }
+    })
+    for (let index = 0; index < _checkedItem.length; index++) {
+        console.log(_checkedItem[index].ID)
+        var res = await updateGIG_MTH_Details(_checkedItem[index].ID, "no")
+    }
+}
+
+//--------------------------
 function calDayOfWeek(date) {
-    if(date=="98/08/05")
-    {
+    if (date == "98/08/05") {
         debugger
     }
     var mounth = ""

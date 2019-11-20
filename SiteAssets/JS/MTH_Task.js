@@ -33,7 +33,7 @@ $(document).ready(function () {
        
     }
     */
-    
+
     showCartabl();
 
 });
@@ -129,7 +129,6 @@ async function showCartabl() {
 
 function GetGIG_MTH_Details(filterGIG_MTH_Details, filterstep) {
     return new Promise(resolve => {
-        debugger
         var filterStatusWF
         if (filterGIG_MTH_Details == "admin") {
             filterStatusWF = "(StatusWF eq 'درگردش')";
@@ -147,7 +146,7 @@ function GetGIG_MTH_Details(filterGIG_MTH_Details, filterstep) {
             }
 
         }
-        console.log(filterStatusWF)
+        //  console.log(filterStatusWF)
 
 
         $pnp.sp.web.lists.
@@ -160,7 +159,7 @@ function GetGIG_MTH_Details(filterGIG_MTH_Details, filterstep) {
             // orderBy("Modified", true).
             get().
             then(function (items) {
-                debugger
+
                 if (items.length == 0) {
                     resolve("null")
                 }
@@ -268,19 +267,18 @@ function getGIG_MTH_DetailsById(id) {
 //Delete
 function deleteRecord(id) {
     return new Promise(resolve => {
-    var list = $pnp.sp.web.lists.getByTitle("GIG_MTH_Request");
+        var list = $pnp.sp.web.lists.getByTitle("GIG_MTH_Request");
 
-    list.items.
-   // top(20).
-    getById(id).
-    delete().
-    then(function (item) {
-        debugger
-       // Console.log("item has been deleted");
-    }, function (data) {
-        //Console.log("error: " + data);
+        list.items.
+            // top(20).
+            getById(id).
+            delete().
+            then(function (item) {
+                // Console.log("item has been deleted");
+            }, function (data) {
+                //Console.log("error: " + data);
+            });
     });
-});
 }
 
 //-----------------------------
@@ -312,11 +310,23 @@ async function reject() {
     _checkedItem = [];
     showCartabl();
 }
+async function selectAllchk(s) {
+    var res = $(s)[0].checked;
+    if (res == true) {
+        $("#tableres2 table tr td input").each(function () {
+            $(this).context.checked = true
+        })
+
+    }
+    else {
+        $("#tableres2 table tr td input").each(function () {
+            $(this).context.checked = false
+        })
+    }
+
+}
 //--------------------------
 function calDayOfWeek(date) {
-    if (date == "98/08/05") {
-        debugger
-    }
     var mounth = ""
     var rooz = ""
     var arrayDate = date.split("/")

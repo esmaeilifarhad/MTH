@@ -320,8 +320,8 @@ function calDayOfWeek(date) {
     var mounth = ""
     var rooz = ""
     var arrayDate = date.split("/")
-    mounth = (arrayDate[1] <= 9) ? "0" + arrayDate[1] : arrayDate[1]
-    rooz = (arrayDate[2] <= 9) ? "0" + arrayDate[2] : arrayDate[2]
+    mounth = (parseInt(arrayDate[1]) <= 9) ? "0" + parseInt(arrayDate[1]) : parseInt(arrayDate[1])
+    rooz = (parseInt(arrayDate[2]) <= 9) ? "0" + parseInt(arrayDate[2]) : parseInt(arrayDate[2])
 
     date = arrayDate[0] + mounth + rooz;
 

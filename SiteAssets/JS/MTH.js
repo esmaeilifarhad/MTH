@@ -25,7 +25,7 @@ $(document).ready(function () {
     CurrentName = sessionStorage.getItem("PFName");
     CurrentDep = sessionStorage.getItem("DName");
     CurrentPLoginName = sessionStorage.getItem("CurrentPLoginName");
-   
+
     //callservice();
     // callserviceTolidCode();
     ShowIndividualprofile();
@@ -78,11 +78,12 @@ function removeRow(ss, Id) {
     $($(ss).closest("tr")).remove();
 }
 function calDayOfWeek(date) {
+    var year = ""
     var mounth = ""
     var rooz = ""
     var arrayDate = date.split("/")
-    mounth = (arrayDate[1] <= 9) ? "0" + arrayDate[1] : arrayDate[1]
-    rooz = (arrayDate[2] <= 9) ? "0" + arrayDate[2] : arrayDate[2]
+    mounth = (parseInt(arrayDate[1]) <= 9) ? "0" + parseInt(arrayDate[1]) : parseInt(arrayDate[1])
+    rooz = (parseInt(arrayDate[2]) <= 9) ? "0" + parseInt(arrayDate[2]) : parseInt(arrayDate[2])
 
     date = arrayDate[0] + mounth + rooz;
 
@@ -140,10 +141,17 @@ async function save() {
 async function addDetail() {
     _Id += 1;
     var pdpDark = $("#pdpDark").val()
+
+    var arrayDate = pdpDark.split("/")
+    mounth = (arrayDate[1] <= 9) ? "0" + arrayDate[1] : arrayDate[1]
+    rooz = (arrayDate[2] <= 9) ? "0" + arrayDate[2] : arrayDate[2]
+    year = arrayDate[0].substring(2, 4)
+    pdpDark = year+"/"+mounth+"/"+rooz;
+debugger
     var description = $("#description").val()
     var isFood = $("#isFood").prop("checked")
 
-
+   
     var IsDuplicate = await GetGIG_MTH_Details(pdpDark)
     if (IsDuplicate.length > 0) {
         showMessage("برای این روز  " + pdpDark + " درخواست ثبت شده است")
@@ -162,9 +170,8 @@ async function addDetail() {
         showMessage("توضیحات باید بیشتر از 10 کاراکتر باشد")
         return;
     }
-
-
     $("#message p").remove();
+    debugger
     _DetailsObjects.push({ ID: _Id, pdpDark: pdpDark, isFood: isFood, description: description })
 
     var table = ""
@@ -188,7 +195,7 @@ async function addDetail() {
 }
 //-------------------------------------------------------
 async function ShowIndividualprofile() {
-    _PersonelInfo=await servicePersonelInfo();
+    _PersonelInfo = await servicePersonelInfo();
     console.log(_PersonelInfo.PersonelInfo)
     console.log(_PersonelInfo.PersonelInfo.Gender)
     $("#NameUser").next().remove();
@@ -213,19 +220,19 @@ function showMessage(message) {
 }
 //-------------------------------------------------------
 function CreateGIG_MTH_Request() {
-   // var description = $("#description").val()
-   // var isFood = $("#isFood").prop("checked")
+    // var description = $("#description").val()
+    // var isFood = $("#isFood").prop("checked")
     return new Promise(resolve => {
         $pnp.sp.web.lists.getByTitle("GIG_MTH_Request").items.add({
             Title: CurrentName,
             Personelid: CurrentPID,
-           // Description: description,
-            UserId:sessionStorage.getItem("UID"),
+            // Description: description,
+            UserId: sessionStorage.getItem("UID"),
             DepName: CurrentDep,
-            DepId:_PersonelInfo.PersonelInfo.DepId,
+            DepId: _PersonelInfo.PersonelInfo.DepId,
             CID: CurrentCID,
             IsFinish: "درگردش"
-           // confirmUserId: 641/*MTH_Confirm => group*/
+            // confirmUserId: 641/*MTH_Confirm => group*/
         }).then(function (item) {
             console.log(item);
             resolve(item);
@@ -241,7 +248,7 @@ function CreateGIG_MTH_Details(GIG_MTH_Request, GIG_MTH_Details) {
             IsFood: GIG_MTH_Details.isFood,
             Dsc: GIG_MTH_Details.description,
             MasterIdId: GIG_MTH_Request.data.Id,
-            step:1
+            step: 1
         }).then(function (item) {
             //console.log(item);
             resolve(item);
@@ -254,12 +261,12 @@ function GetGIG_MTH_Details(_Date) {
         $pnp.sp.web.lists.
             getByTitle("GIG_MTH_Details").
             items.select("Date,MasterId/Personelid").
-             expand("MasterId").
-            filter("(Date eq '" + _Date + "') and (MasterId/Personelid eq  "+CurrentPID+")").
+            expand("MasterId").
+            filter("(Date eq '" + _Date + "') and (MasterId/Personelid eq  " + CurrentPID + ")").
             // orderBy("Modified", true).
             get().
             then(function (items) {
-debugger
+                debugger
                 resolve(items);
             });
     });
@@ -267,7 +274,7 @@ debugger
 function servicePersonelInfo() {
     return new Promise(resolve => {
         var serviceURL = "https://portal.golrang.com/_vti_bin/SPService.svc/InformationPersonel"
-        var request = { PersonelId:CurrentPID, CID: CurrentCID }
+        var request = { PersonelId: CurrentPID, CID: CurrentCID }
         $.ajax({
             type: "POST",
             url: serviceURL,
@@ -280,7 +287,7 @@ function servicePersonelInfo() {
             //processData: false,
             success: function (data) {
                 resolve(data);
-               // console.log(data);
+                // console.log(data);
 
             },
             error: function (a) {

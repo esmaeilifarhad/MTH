@@ -1,0 +1,176 @@
+ /*.tblH {
+    color: black;
+}*/
+/*
+ .tblH td,th {
+    padding: 4px;
+    border: 1px solid black;
+}
+*/
+/*
+button{
+  background-color: #ce4415!important
+}
+*/
+ #tableres2 th {
+    text-align: right;
+font-weight: bolder;
+color: yellow;
+}
+#imgFatLevel{
+    text-align: center
+}
+.onvan{
+    font-weight: bold;
+}
+#WebPartWPQ2{
+  background-color:#f3eded;
+}
+h3 {
+    color: #97161b;
+    text-shadow: 1px 1px 2px rgb(20, 20, 19), 0 0 25px rgb(115, 115, 212), 0 0 5px rgb(64, 219, 134);
+  }
+
+ .main #tableres {
+
+   /* background-color:white;*/
+    -webkit-animation-name: example; /* Safari 4.0 - 8.0 */
+    -webkit-animation-duration:3s; /* Safari 4.0 - 8.0 */
+    animation-name: example;
+    animation-duration: 3s;
+  }
+  
+  /* Safari 4.0 - 8.0 */
+  @-webkit-keyframes example {
+    from {background-color: white;}
+    to {background-color: gray;}
+  }
+  
+  /* Standard syntax */
+  @keyframes example {
+    from {background-color: white;}
+    to {background-color: gray;}
+  }
+  #message a{
+    font-weight: bolder;
+  color:blue;
+  }
+#message .message{
+  -webkit-animation-name: showMessage; /* Safari 4.0 - 8.0 */
+  -webkit-animation-duration:8s; /* Safari 4.0 - 8.0 */
+  animation-name: showMessage;
+  animation-duration: 8s;
+ 
+  font-weight: bolder;
+  color: red;
+}
+  /* Safari 4.0 - 8.0 */
+  @-webkit-keyframes showMessage {
+    0%   { right:0px; top:0px;}
+    25%  { right:200px; top:20px;}
+    50%  { right:300px; top:40px;}
+    75%  { right:400px; top:60px;}
+    100% { right:0px; top:0px;}
+  }
+  
+  /* Standard syntax */
+  @keyframes showMessage {
+    0%   {color: black }
+    25%  { /*text-shadow: 1px 1px 2px black, 0 0 25px blue, 0 0 5px darkblue;*/ }
+    50%  { /*text-shadow: 1px 1px 2px black, 0 0 25px blue, 0 0 5px darkblue;*/ }
+    75%  { }
+    100% { left:500px; top:500px;color: red;font-weight: bolder}
+  }
+
+
+  .main #imgFatLevel {
+      /*
+    width: 100px;
+    height: 100px;
+    background-color: red;*/
+    position: relative;
+    -webkit-animation-name: example2; /* Safari 4.0 - 8.0 */
+    -webkit-animation-duration: 4s; /* Safari 4.0 - 8.0 */
+    -webkit-animation-delay: 2s; /* Safari 4.0 - 8.0 */
+    animation-name: example2;
+    animation-duration: 4s;
+    animation-delay: -2s;
+ 
+}
+  /* Safari 4.0 - 8.0 */
+  @-webkit-keyframes example2 {
+    0%   {background-color:red; left:0px; top:0px;}
+    25%  {background-color:yellow; left:200px; top:0px;}
+    50%  {background-color:blue; left:200px; top:200px;}
+    75%  {background-color:green; left:0px; top:200px;}
+    100% {background-color:red; left:0px; top:0px;}
+  }
+  
+  /* Standard syntax */
+  @keyframes example2 {
+    0%   { left:0px; top:0px;}
+    25%  { left:200px; top:20px;}
+    50%  { left:200px; top:40;}
+    75%  { left:0px; top:60;}
+    100% { left:0px; top:0px;}
+  }
+  .main h3 {
+    /*
+  width: 100px;
+  height: 100px;
+  background-color: red;*/
+  position: relative;
+  -webkit-animation-name: moveh3; /* Safari 4.0 - 8.0 */
+  -webkit-animation-duration: 4s; /* Safari 4.0 - 8.0 */
+  -webkit-animation-delay: 2s; /* Safari 4.0 - 8.0 */
+  animation-name: moveh3;
+  animation-duration: 4s;
+  animation-delay: -2s;
+
+}
+
+  /* Safari 4.0 - 8.0 */
+  
+  @-webkit-keyframes moveh3 {
+    0%   { right:0px; top:0px;}
+    25%  { right:200px; top:20px;}
+    50%  { right:300px; top:40px;}
+    75%  { right:400px; top:60px;}
+    100% { right:0px; top:0px;}
+  }
+  
+  /* Standard syntax */
+  @keyframes moveh3 {
+    0%   { right:0px; top:0px;color:red}
+    25%  { right:200px; top:0px;color:blue}
+    50%  { right:300px; top:0px;}
+    75%  { right:600px; top:0px;}
+    100% { right:0px; top:0px;}
+  }
+  .moshakhast{
+   /* background-color:#9fbb83;*/
+    background-image: linear-gradient(to right, rgba(255,0,0,0), #9270e2);
+  }
+  .moshakhast tr td :hover{
+   color:gray;
+  }
+  #tableres{
+    background-color: beige;
+   /* background-color: red;*/ /* For browsers that do not support gradients */
+   /* background-image: linear-gradient(to bottom right, red, yellow); */
+    background-image: linear-gradient(to bottom right, #a3bcf1, #f17356);
+  }
+  #tableres2{
+    color: white;
+    background-color: beige;
+   /* background-color: red;*/ /* For browsers that do not support gradients */
+   /* background-image: linear-gradient(to bottom right, red, yellow); */
+    background-image: linear-gradient(to bottom right, #9a090f, #230435);
+  }
+  #dore{
+    background-color: beige;
+   /* background-color: red;*/ /* For browsers that do not support gradients */
+   /* background-image: linear-gradient(to bottom right, red, yellow); */
+    background-image: linear-gradient(to bottom right, #f16a6a, #613af0);
+  }
+

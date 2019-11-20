@@ -27,7 +27,13 @@ $(document).ready(function () {
     CurrentDep = sessionStorage.getItem("DName");
     CurrentPLoginName = sessionStorage.getItem("CurrentPLoginName");
 
-
+    /*
+    for (let index = 1300; index < 1370; index++) {
+        deleteRecord(index);
+       
+    }
+    */
+    
     showCartabl();
 
 });
@@ -40,31 +46,54 @@ function showMessage(message) {
     $("#message").append("<p class='message'>" + message + "</p>");
 }
 async function showCartabl() {
-
+    $("#tableres2 table  .rowData").remove()
+    //---------------------
+    var GIG_MTH_Details;
     var GIG_MTH_Confirm = await GetGIG_MTH_Confirm();
     var CurrentUserinGroups = await getCurrentUserinGroups();
-
-    //console.log(CurrentUserinGroups)
+    //---------------------
+    //create filter
     var filterGIG_MTH_Details = ""
-    for (let index = 0; index < GIG_MTH_Confirm.length; index++) {
-        var res = CurrentUserinGroups.find(x => x.ID === GIG_MTH_Confirm[index].ConfirmationId);
-        if (res != undefined) {
-            filterGIG_MTH_Details += "  (MasterId/DepId eq '" + GIG_MTH_Confirm[index].DepId + "') or"
+    var filterstep = ""
+    //آیا کاربر در گروه مشاهده همه میباشد
+    //اگر باشد باید همهی رکورد ها را مشاهده نماید
+    var isExist = CurrentUserinGroups.find(x => x.ID === 649)
+    if (isExist != undefined) {
+        GIG_MTH_Details = await GetGIG_MTH_Details("admin", "admin")
+    }
+    else {
+        for (let index = 0; index < GIG_MTH_Confirm.length; index++) {
+
+            var res = CurrentUserinGroups.find(x => x.ID === GIG_MTH_Confirm[index].ConfirmationId);
+            if (res != undefined /*&&  GIG_MTH_Confirm[index].DepId!=null*/) {
+                if (GIG_MTH_Confirm[index].DepId != null) {
+                    filterGIG_MTH_Details += "  (MasterId/DepId eq '" + GIG_MTH_Confirm[index].DepId + "') or";
+                }
+
+                filterstep += "(step eq " + GIG_MTH_Confirm[index].Step + ") or "
+            }
         }
+
+        //---------------------delete last 4 char for remove or
+        if (filterGIG_MTH_Details != "") {
+            filterGIG_MTH_Details = "(" + filterGIG_MTH_Details.substring(0, filterGIG_MTH_Details.length - 3) + ")";
+        }
+        if (filterstep != "") {
+            filterstep = "(" + filterstep.substring(0, filterstep.length - 3) + ")";
+        }
+        GIG_MTH_Details = await GetGIG_MTH_Details(filterGIG_MTH_Details, filterstep)
     }
 
-    //delete last 4 char for remove or
-    filterGIG_MTH_Details = filterGIG_MTH_Details.substring(0, filterGIG_MTH_Details.length - 3)
-
-
-    var GIG_MTH_Details = await GetGIG_MTH_Details(filterGIG_MTH_Details)
-    if (GIG_MTH_Details == "" || GIG_MTH_Details == undefined) {
-        $("#tableres2 table").append("<tr><td colspan=8>موردی برای مشاهده وجود ندارد</td></tr>");
+    if (GIG_MTH_Details == "null") {
+        $("#tableres2 table").append("<tr class='rowData'><td colspan=9>موردی برای مشاهده وجود ندارد</td></tr>");
     }
     else {
         var table = ""
         for (let index = 0; index < GIG_MTH_Details.length; index++) {
-            table += "<tr Data_Id=" + GIG_MTH_Details[index].ID + ">"
+            table += "<tr class='rowData' Data_Id=" + GIG_MTH_Details[index].ID + ">"
+            table += "<td >"
+            table += GIG_MTH_Details[index].step
+            table += "</td>"
             table += "<td col='pdpDark'>"
             table += (index + 1)
             table += "</td>"
@@ -98,22 +127,46 @@ async function showCartabl() {
 }
 //-------------------------------------------------------
 
-function GetGIG_MTH_Details(filterGIG_MTH_Details) {
-    // console.log(filterGIG_MTH_Details)
-
-    if (filterGIG_MTH_Details == null || filterGIG_MTH_Details == "")
-        return
+function GetGIG_MTH_Details(filterGIG_MTH_Details, filterstep) {
     return new Promise(resolve => {
+        debugger
+        var filterStatusWF
+        if (filterGIG_MTH_Details == "admin") {
+            filterStatusWF = "(StatusWF eq 'درگردش')";
+        }
+        else if (filterGIG_MTH_Details == "" && filterstep == "") {
+            resolve("null");
+            return
+        }
+        else {
+            if (filterGIG_MTH_Details == "") {
+                filterStatusWF = "(StatusWF eq 'درگردش')" + " and " + filterstep
+            }
+            else {
+                filterStatusWF = "(StatusWF eq 'درگردش')" + " and " + filterGIG_MTH_Details + " and " + filterstep
+            }
+
+        }
+        console.log(filterStatusWF)
+
+
         $pnp.sp.web.lists.
             getByTitle("GIG_MTH_Details").
-            items.select("MasterId/Id,MasterId/Title,MasterId/Personelid,MasterId/DepName,Id,Title,Dsc,IsFood,Date").top(1000).
+            items.select("MasterId/Id,MasterId/Title,MasterId/Personelid,MasterId/DepName,Id,Title,Dsc,IsFood,Date,step").top(1000).
             expand("MasterId").
-            filter("(StatusWF eq 'درگردش') and (" + filterGIG_MTH_Details + ")").
+            // filter("(StatusWF eq 'درگردش') and (" + filterGIG_MTH_Details + ") and (" + filterstep + ")").
+            // filter("(StatusWF eq 'درگردش') and (  (MasterId/DepId eq '289') or  (MasterId/DepId eq '284') ) ").
+            filter(filterStatusWF).
             // orderBy("Modified", true).
             get().
             then(function (items) {
-                // debugger
-                resolve(items);
+                debugger
+                if (items.length == 0) {
+                    resolve("null")
+                }
+                else {
+                    resolve(items);
+                }
             });
     });
 }
@@ -156,24 +209,46 @@ function getCurrentUserinGroups() {
         });
     })
 }
-function updateGIG_MTH_Details(id, type) {
-    if (type = "yes") {
-        return new Promise(resolve => {
-            var list = $pnp.sp.web.lists.getByTitle("GIG_MTH_Details");
-            list.items.getById(id).update({
-                step: 1,
-            }).then(function (item) {
-                resolve(item)
-                // console.log(item);
-            });
-
-        })
+function updateGIG_MTH_Details(id, type, step) {
+    debugger
+    var StatusWF = ""
+    var varStep = 0
+    debugger
+    if (type == "yes" && step == 2) {
+        StatusWF = "خاتمه یافته"
+        varStep = 3
     }
+    else if (type == "yes" && step == 1) {
+        StatusWF = "درگردش"
+        varStep = 2
+    }
+    else if (type == "no") {
+        StatusWF = "تایید نشده"
+        varStep = 0
+    }
+    else {
+        StatusWF = "else"
+        varStep = 0
+    }
+
+    return new Promise(resolve => {
+        var list = $pnp.sp.web.lists.getByTitle("GIG_MTH_Details");
+        list.items.getById(id).update({
+            step: varStep,
+            StatusWF: StatusWF,
+        }).then(function (item) {
+            resolve(item)
+            // console.log(item);
+        });
+
+    })
+    /*
     if (type = "no") {
         return new Promise(resolve => {
             var list = $pnp.sp.web.lists.getByTitle("GIG_MTH_Details");
             list.items.getById(id).update({
                 step: 0,
+                StatusWF: "تایید نشده",
             }).then(function (item) {
                 resolve(item)
                 // console.log(item);
@@ -181,37 +256,62 @@ function updateGIG_MTH_Details(id, type) {
 
         })
     }
+    */
+}
+function getGIG_MTH_DetailsById(id) {
+    return new Promise(resolve => {
+        $pnp.sp.web.lists.getByTitle("GIG_MTH_Details").items.getById(id).get().then(function (item) {
+            resolve(item);
+        });
+    });
+}
+//Delete
+function deleteRecord(id) {
+    return new Promise(resolve => {
+    var list = $pnp.sp.web.lists.getByTitle("GIG_MTH_Request");
+
+    list.items.
+   // top(20).
+    getById(id).
+    delete().
+    then(function (item) {
+        debugger
+       // Console.log("item has been deleted");
+    }, function (data) {
+        //Console.log("error: " + data);
+    });
+});
 }
 
 //-----------------------------
 async function confirm() {
     $("#tableres2 table tr td input").each(function () {
-        //  console.log($(this))
-        // console.log($(this).context.checked)
-        // console.log($(this).init)
         if ($(this).context.checked == true) {
             _checkedItem.push({ ID: $(this).attr("data_id") })
         }
     })
     for (let index = 0; index < _checkedItem.length; index++) {
-        console.log(_checkedItem[index].ID)
-        var res = await updateGIG_MTH_Details(_checkedItem[index].ID, "yes")
+        debugger
+        var GIG_MTH_Detail = await getGIG_MTH_DetailsById(_checkedItem[index].ID);
+        var res = await updateGIG_MTH_Details(_checkedItem[index].ID, "yes", GIG_MTH_Detail.step)
     }
-
+    _checkedItem = [];
+    showCartabl();
     // alert("confirm")
 }
-function reject() {
+async function reject() {
     $("#tableres2 table tr td input").each(function () {
         if ($(this).context.checked == true) {
             _checkedItem.push({ ID: $(this).attr("data_id") })
         }
     })
     for (let index = 0; index < _checkedItem.length; index++) {
-        console.log(_checkedItem[index].ID)
-        var res = await updateGIG_MTH_Details(_checkedItem[index].ID, "no")
+        var GIG_MTH_Detail = await getGIG_MTH_DetailsById(_checkedItem[index].ID);
+        var res = await updateGIG_MTH_Details(_checkedItem[index].ID, "no", GIG_MTH_Detail.step)
     }
+    _checkedItem = [];
+    showCartabl();
 }
-
 //--------------------------
 function calDayOfWeek(date) {
     if (date == "98/08/05") {

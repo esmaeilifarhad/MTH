@@ -241,7 +241,7 @@ function CreateGIG_MTH_Details(GIG_MTH_Request, GIG_MTH_Details) {
             IsFood: GIG_MTH_Details.isFood,
             Dsc: GIG_MTH_Details.description,
             MasterIdId: GIG_MTH_Request.data.Id,
-            step:0
+            step:1
         }).then(function (item) {
             //console.log(item);
             resolve(item);

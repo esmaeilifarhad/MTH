@@ -130,15 +130,30 @@ async function save() {
             return;
         }
     }
+    $("#btnSave").attr('disabled', 'disabled')
     var GIG_MTH_Request = await CreateGIG_MTH_Request();
     for (let index = 0; index < _DetailsObjects.length; index++) {
         var GIG_MTH_Detail = await CreateGIG_MTH_Details(GIG_MTH_Request, _DetailsObjects[index]);
     }
+   // $("#btnSave").attr('disabled', 'enabled')
     showMessage("درخواست شما با موفقیت ذخیره شد")
-    $("#message").append("<a target='_blank' href='https://portal.golrang.com/_layouts/15/foodorder/foodorderpage.aspx'>لطفا برای اتخاب غذا کلیک نمایید</a>");
+    $("#message").append("<br/><a target='_blank' href='https://portal.golrang.com/_layouts/15/foodorder/foodorderpage.aspx'>لطفا برای انتخاب غذا کلیک نمایید</a>");
+    $("#message").append("<br/><a target='_blank' href='https://portal.golrang.com/hr/Services/Pages/MTH_MyRequest.aspx'>برای مشاهده درخواست های خود کلیک نمایید</a>");
     //
 }
 async function addDetail() {
+    const m = moment();
+    var today = moment().format('jYYYY/jM/jD');//Today
+    // console.log(pdpDark);
+    // console.log(today);
+
+    var todayarray = today.split("/")
+    mounth = (parseInt(todayarray[1]) <= 9) ? "0" + parseInt(todayarray[1]) : parseInt(todayarray[1])
+    rooz = (parseInt(todayarray[2]) <= 9) ? "0" + parseInt(todayarray[2]) : parseInt(todayarray[2])
+    year = todayarray[0].substring(2, 4)
+    today = year + "" + mounth + "" + rooz
+
+
     _Id += 1;
     var pdpDark = $("#pdpDark").val()
 
@@ -146,12 +161,13 @@ async function addDetail() {
     mounth = (arrayDate[1] <= 9) ? "0" + arrayDate[1] : arrayDate[1]
     rooz = (arrayDate[2] <= 9) ? "0" + arrayDate[2] : arrayDate[2]
     year = arrayDate[0].substring(2, 4)
-    pdpDark = year+"/"+mounth+"/"+rooz;
-debugger
+    var selectDate = year + "" + mounth + "" + rooz
+    pdpDark = year + "/" + mounth + "/" + rooz;
+
     var description = $("#description").val()
     var isFood = $("#isFood").prop("checked")
 
-   
+
     var IsDuplicate = await GetGIG_MTH_Details(pdpDark)
     if (IsDuplicate.length > 0) {
         showMessage("برای این روز  " + pdpDark + " درخواست ثبت شده است")
@@ -170,6 +186,13 @@ debugger
         showMessage("توضیحات باید بیشتر از 10 کاراکتر باشد")
         return;
     }
+    debugger
+    if (parseInt(today) > parseInt(selectDate)) {
+
+        showMessage("نمیتوان برای روزهای قبل درخواست ثبت کرد")
+        return;
+    }
+
     $("#message p").remove();
     debugger
     _DetailsObjects.push({ ID: _Id, pdpDark: pdpDark, isFood: isFood, description: description })
@@ -215,6 +238,7 @@ async function ShowIndividualprofile() {
 }
 function showMessage(message) {
     $("#message p").remove()
+    $("#message a").remove()
     // setTimeout(function () { $("#message p").remove() }, 5000);
     $("#message").append("<p class='message'>" + message + "</p>");
 }
@@ -266,7 +290,6 @@ function GetGIG_MTH_Details(_Date) {
             // orderBy("Modified", true).
             get().
             then(function (items) {
-                debugger
                 resolve(items);
             });
     });

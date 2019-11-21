@@ -91,11 +91,12 @@ async function showCartabl() {
         var table = ""
         for (let index = 0; index < GIG_MTH_Details.length; index++) {
             table += "<tr class='rowData' Data_Id=" + GIG_MTH_Details[index].ID + ">"
-            table += "<td >"
-            table += GIG_MTH_Details[index].step
-            table += "</td>"
+           
             table += "<td col='pdpDark'>"
             table += (index + 1)
+            table += "</td>"
+            table += "<td >"
+            table += GIG_MTH_Details[index].step
             table += "</td>"
             table += "<td col='pdpDark'>"
             table += GIG_MTH_Details[index].MasterId.Title

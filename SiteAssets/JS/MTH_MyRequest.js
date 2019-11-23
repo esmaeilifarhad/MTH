@@ -108,7 +108,7 @@ function GetGIG_MTH_Details() {
             // filter("(StatusWF eq 'درگردش') and (" + filterGIG_MTH_Details + ") and (" + filterstep + ")").
             // filter("(StatusWF eq 'درگردش') and (  (MasterId/DepId eq '289') or  (MasterId/DepId eq '284') ) ").
             filter("MasterId/Personelid eq "+CurrentPID+"").
-            // orderBy("Modified", true).
+             orderBy("Date", false).
             get().
             then(function (items) {
                 

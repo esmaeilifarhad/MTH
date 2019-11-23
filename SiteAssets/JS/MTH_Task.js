@@ -284,6 +284,9 @@ function deleteRecord(id) {
 
 //-----------------------------
 async function confirm() {
+    $(this).prop('disabled', true);
+    $.LoadingOverlay("show");
+
     $("#tableres2 table tr td input").each(function () {
         if ($(this).context.checked == true) {
             _checkedItem.push({ ID: $(this).attr("data_id") })
@@ -296,7 +299,10 @@ async function confirm() {
     }
     _checkedItem = [];
     showCartabl();
-    // alert("confirm")
+
+    $(this).prop('disabled', false);
+    $.LoadingOverlay("hide");
+
 }
 async function reject() {
     $("#tableres2 table tr td input").each(function () {

@@ -13,12 +13,20 @@ GIG_MTH_Request
 GIG_MTH_Details
 */
 $(document).ready(function () {
+   
     //-----npm initial header Request
     $pnp.setup({
         headers: {
             "Accept": "application/json; odata=verbose"
         }
     });
+
+    // $(document).ajaxStart(function () {
+    //     $.LoadingOverlay("show");
+    // });
+    // $(document).ajaxComplete(function (event, request, set) {
+    //     $.LoadingOverlay("hide");
+    // });
     //-------------
     CurrentCID = sessionStorage.getItem("CID");
     CurrentPID = sessionStorage.getItem("PID");
@@ -28,7 +36,13 @@ $(document).ready(function () {
 
     //callservice();
     // callserviceTolidCode();
+   // $.LoadingOverlay("show");
+    //$.LoadingOverlay("show");
+
+ 
     ShowIndividualprofile();
+    // $.LoadingOverlay("hide"); 
+   // $(".container").LoadingOverlay("show");
 });
 //----------------------
 $("#pdpStartToday").persianDatepicker({
@@ -130,16 +144,24 @@ async function save() {
             return;
         }
     }
-    $("#btnSave").attr('disabled', 'disabled')
+   // $("#btnSave").attr('disabled', 'disabled')
+    
+    $('#btnSave').prop('disabled', true);
+
+    $.LoadingOverlay("show");
+  
+
     var GIG_MTH_Request = await CreateGIG_MTH_Request();
     for (let index = 0; index < _DetailsObjects.length; index++) {
         var GIG_MTH_Detail = await CreateGIG_MTH_Details(GIG_MTH_Request, _DetailsObjects[index]);
     }
-   // $("#btnSave").attr('disabled', 'enabled')
+    // $("#btnSave").attr('disabled', 'enabled')
     showMessage("درخواست شما با موفقیت ذخیره شد")
     $("#message").append("<br/><a target='_blank' href='https://portal.golrang.com/_layouts/15/foodorder/foodorderpage.aspx'>لطفا برای انتخاب غذا کلیک نمایید</a>");
     $("#message").append("<br/><a target='_blank' href='https://portal.golrang.com/hr/Services/Pages/MTH_MyRequest.aspx'>برای مشاهده درخواست های خود کلیک نمایید</a>");
-    //
+    
+    $.LoadingOverlay("hide");
+    $('#btnSave').prop('disabled', false);
 }
 async function addDetail() {
     const m = moment();
@@ -218,6 +240,7 @@ async function addDetail() {
 }
 //-------------------------------------------------------
 async function ShowIndividualprofile() {
+
     _PersonelInfo = await servicePersonelInfo();
     console.log(_PersonelInfo.PersonelInfo)
     console.log(_PersonelInfo.PersonelInfo.Gender)

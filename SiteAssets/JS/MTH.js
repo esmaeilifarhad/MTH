@@ -144,10 +144,9 @@ async function save() {
             return;
         }
     }
-   // $("#btnSave").attr('disabled', 'disabled')
-    
-    $('#btnSave').prop('disabled', true);
 
+   // save
+    $('#btnSave').prop('disabled', true);
     $.LoadingOverlay("show");
   
 
@@ -155,7 +154,6 @@ async function save() {
     for (let index = 0; index < _DetailsObjects.length; index++) {
         var GIG_MTH_Detail = await CreateGIG_MTH_Details(GIG_MTH_Request, _DetailsObjects[index]);
     }
-    // $("#btnSave").attr('disabled', 'enabled')
     showMessage("درخواست شما با موفقیت ذخیره شد")
     $("#message").append("<br/><a target='_blank' href='https://portal.golrang.com/_layouts/15/foodorder/foodorderpage.aspx'>لطفا برای انتخاب غذا کلیک نمایید</a>");
     $("#message").append("<br/><a target='_blank' href='https://portal.golrang.com/hr/Services/Pages/MTH_MyRequest.aspx'>برای مشاهده درخواست های خود کلیک نمایید</a>");
@@ -168,6 +166,7 @@ async function addDetail() {
     var today = moment().format('jYYYY/jM/jD');//Today
     // console.log(pdpDark);
     // console.log(today);
+  
 
     var todayarray = today.split("/")
     mounth = (parseInt(todayarray[1]) <= 9) ? "0" + parseInt(todayarray[1]) : parseInt(todayarray[1])
@@ -178,7 +177,7 @@ async function addDetail() {
 
     _Id += 1;
     var pdpDark = $("#pdpDark").val()
-
+    
     var arrayDate = pdpDark.split("/")
     mounth = (arrayDate[1] <= 9) ? "0" + arrayDate[1] : arrayDate[1]
     rooz = (arrayDate[2] <= 9) ? "0" + arrayDate[2] : arrayDate[2]
@@ -186,10 +185,16 @@ async function addDetail() {
     var selectDate = year + "" + mounth + "" + rooz
     pdpDark = year + "/" + mounth + "/" + rooz;
 
+   
     var description = $("#description").val()
     var isFood = $("#isFood").prop("checked")
 
+    var numberDays= numberDaysTwoDate("13"+pdpDark,moment().format('jYYYY/jM/jD'));
 
+    if(numberDays>7){
+        showMessage("حداکثر از یک هفته قبل از تاریخ  "+"13"+pdpDark +"  میتوان درخواست ثبت کرد")
+        return;  
+    }
     var IsDuplicate = await GetGIG_MTH_Details(pdpDark)
     if (IsDuplicate.length > 0) {
         showMessage("برای این روز  " + pdpDark + " درخواست ثبت شده است")
@@ -353,4 +358,28 @@ function foramtDate(str) {
 function splitString(str) {
     return str.split(";#")
 }
+/*
+Pass you dates to this function like this:  showDays('1/1/2014','12/25/2014')
+
+پارامتر وردی تابع شمسی میباشد
+1367/07/09
+*/
+function numberDaysTwoDate(firstDate, secondDate) {
+   
+    var firstDate = moment(firstDate, 'jYYYY/jM/jD ').format('M/D/YYYY')//'1/1/2014'
+    var secondDate = moment(secondDate, 'jYYYY/jM/jD ').format('M/D/YYYY')//'1/1/2014'
+
+
+    var startDay = new Date(firstDate);
+    var endDay = new Date(secondDate);
+    var millisecondsPerDay = 1000 * 60 * 60 * 24;
+
+    var millisBetween = startDay.getTime() - endDay.getTime();
+    var days = millisBetween / millisecondsPerDay;
+
+    // Round down.
+    return(Math.floor(days));
+
+}
+
 //-----------------------

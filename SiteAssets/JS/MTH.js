@@ -213,7 +213,7 @@ async function addDetail() {
         showMessage("توضیحات باید بیشتر از 10 کاراکتر باشد")
         return;
     }
-    debugger
+  
     if (parseInt(today) > parseInt(selectDate)) {
 
         showMessage("نمیتوان برای روزهای قبل درخواست ثبت کرد")
@@ -221,7 +221,7 @@ async function addDetail() {
     }
 
     $("#message p").remove();
-    debugger
+ 
     _DetailsObjects.push({ ID: _Id, pdpDark: pdpDark, isFood: isFood, description: description })
 
     var table = ""
